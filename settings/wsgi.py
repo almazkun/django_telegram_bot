@@ -1,5 +1,4 @@
-"""
-WSGI config for settings project.
+"""WSGI config for settings project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

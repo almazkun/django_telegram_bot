@@ -1,0 +1,74 @@
+<script>
+    let maxTry = 5;
+    const chatPk = "{{ chat.pk }}";
+    const username = "{{ user.username }}";
+    const chatList = document.querySelector('#chat-list');
+    let chatLog = document.querySelector('#chat-log');
+    const scrollChatLog = () => {
+            chatLog.scrollTop = chatLog.scrollHeight;
+    };
+    const chatMessageInput = document.querySelector('#chat-message-input');
+    const chatSendButton = document.querySelector('#send-button');
+
+    const appendMessage = (message, sender) => {
+        const messageDiv = document.createElement('div');
+        if (sender === username) {
+                messageDiv.classList.add('chat-bubble', 'user-message');
+                messageDiv.innerText = message;
+        } else if (sender === 'system') {
+                messageDiv.classList.add('chat-bubble', 'system-message');
+                messageDiv.innerText = message;
+        } else {
+                messageDiv.classList.add('chat-bubble', 'other-message');
+                messageDiv.innerText = sender + ':\n' + message;
+        }
+        
+        chatLog.appendChild(messageDiv);
+        scrollChatLog();
+    };
+
+    const connectWebSocket = () => {
+            if (chatPk === '') {
+                    return;
+            }
+            const isHTTPS = window.location.protocol === "https:";
+            const chatSocket = new WebSocket(
+                    (isHTTPS ? 'wss://' : 'ws://') + window.location.host + '/ws/chat/' + chatPk + '/'
+            );
+
+            scrollChatLog();
+
+            chatSocket.onmessage = function (e) {
+                    const data = JSON.parse(e.data);
+                    appendMessage(data.message, data.sender);
+            };
+
+            chatSocket.onclose = function (e) {
+                    console.error('Chat socket closed unexpectedly. Reconnecting...');
+                    if (maxTry-- <= 0) {
+                            alert('Chat socket closed unexpectedly. Please refresh the page.');
+                    }
+                    setTimeout(connectWebSocket, 1000);
+            };
+
+            chatMessageInput.focus();
+            chatMessageInput.onkeyup = function (e) {
+                    if (e.keyCode === 13) {
+                            chatSendButton.click();
+                    }
+            };
+
+            chatSendButton.onclick = function (e) {
+                    const message = chatMessageInput.value;
+                    if (message.trim() === '') {
+                            return;
+                    }
+                    chatSocket.send(JSON.stringify({
+                            'message': message
+                    }));
+                    chatMessageInput.value = '';
+            };
+    };
+    
+    connectWebSocket();
+</script>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    <head>
+        {% block meta %}
+            {% include "includes/meta.html" %}
+        {% endblock meta %}
+    </head>
+    <body class="d-flex flex-column h-100">
+        {% block navigation %}
+            {% include "includes/nav.html" %}
+        {% endblock navigation %}
+        <main class="flex-shrink-0">
+            {% block main_content %}
+            {% endblock main_content %}
+        </main>
+        <footer class="navbar bg-dark fixed-bottom">
+        </footer>
+        {% block scripts %}
+            {% include "includes/scripts.html" %}
+        {% endblock scripts %}
+        {% block js_scripts %}
+        {% endblock js_scripts %}
+    </body>
+</html>

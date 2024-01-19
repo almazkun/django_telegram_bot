@@ -1,0 +1,6 @@
+<ul class="list-group list-group-flush">
+    {% for chat in chat_list %}
+        <a href="{% url "chat" chat.pk %}"
+           class="list-group-item list-group-item-action{% if chat == object %} list-group-item-dark" aria-current="true{% endif %}">{{ chat.name }}</a>
+    {% endfor %}
+</ul>

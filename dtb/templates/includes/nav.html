@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+    <div class="container justify-content-between small">
+        <a class="navbar-brand" href="/">ChatDJO</a>
+        {% if user.is_authenticated %}
+            <div class="d-flex">
+                <span class="nav-item me-2">{{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button class="nav-link ps-0" type="submit">Logout</button>
+                </div>
+            {% else %}
+                <div class="d-flex">
+                    <a class="nav-link me-2" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
