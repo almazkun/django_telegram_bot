@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-from dtb.models import Bot, BotCommand, Chat, CustomUser, Message
+from dtb.models import Bot, BotCommand, Chat, Message
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -39,7 +40,7 @@ class BotCommandAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(get_user_model(), CustomUserAdmin)
 admin.site.register(Bot, BotAdmin)
 admin.site.register(Chat, ChatAdmin)
 admin.site.register(Message, MessageAdmin)

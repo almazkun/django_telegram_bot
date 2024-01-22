@@ -1,7 +1,8 @@
 {% extends "_base.html" %}
 {% block main_content %}
     <div class="container">
-        <div class="card mt-5" style="max-width: 36rem; margin: 0 auto;">
+        {% include "includes/about.html" %}
+        <div class="card" style="max-width: 36rem;">
             <div class="card-body">
                 <h1 class="card-title">Login</h1>
                 <form method="post">
@@ -9,6 +10,11 @@
                     {{ form.as_p }}
                     <input class="btn btn-outline-warning" type="submit" value="Login">
                 </form>
+            </div>
+            <div class="card-footer">
+                <p>
+                    Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+                </p>
             </div>
         </div>
     </div>

@@ -37,10 +37,13 @@ class ModelBase(models.Model):
 
 class Bot(ModelBase):
     name = models.CharField(
-        max_length=32, help_text="Human-readable name for thr reference"
+        max_length=32,
+        help_text="Human-readable name for thr reference",
     )
     # BOT_TOKEN=1234567890:aaaaaaaaaa_bbbbbbbbbbbbb-cccccccccc
-    auth_token = models.CharField(max_length=255)
+    auth_token = models.CharField(
+        max_length=255, unique=True, help_text="You can get it from BotFather"
+    )
     # X-Telegram-Bot-Api-Secret-Token
     secret_token = models.CharField(
         max_length=255, default=default_secret_token, editable=False

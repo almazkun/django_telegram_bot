@@ -38,22 +38,37 @@ class BotCreate:
         self.bot_name = bot_name
         self.bot_token = bot_token
         self.user = user
+        self.bot = None
 
     def _create_bot(self):
-        self.bot = self.user.bots.create(name=self.bot_name, auth_token=self.bot_token)
+        if not self.bot:
+            self.bot = self.user.bots.get_or_create(
+                name=self.bot_name, auth_token=self.bot_token
+            )[0]
         return self.bot
 
     def _create_webhook(self):
-        r = BotOut(self.bot).set_webhook(
-            f"{self.domain}{self.bot.get_absolute_url()}", self.bot.secret_token
+        return (
+            BotOut(self.bot)
+            .set_webhook(
+                f"{self.domain}{self.bot.get_absolute_url()}", self.bot.secret_token
+            )
+            .result()
         )
-        return r.result()
 
     def _create_start_command(self):
-        self.bot.commands.get_or_create(command="/start", response=START_RESPONSE)
-        self.bot.commands.get_or_create(command="/help", response=HELP_RESPONSE)
-        self.bot.commands.get_or_create(command="/echo", response="{text}")
-        self.bot.commands.get_or_create(command="/settings", response=SETTINGS_RESPONSE)
+        self.bot.commands.get_or_create(
+            command="/start", defaults={"response": START_RESPONSE}
+        )
+        self.bot.commands.get_or_create(
+            command="/help", defaults={"response": HELP_RESPONSE}
+        )
+        self.bot.commands.get_or_create(
+            command="/echo", defaults={"response": ECHO_RESPONSE}
+        )
+        self.bot.commands.get_or_create(
+            command="/settings", defaults={"response": SETTINGS_RESPONSE}
+        )
 
     def perform(self):
         self._create_bot()

@@ -32,7 +32,6 @@ class TelegramBotClient:
             return json.loads(f.read().decode("utf-8"))
 
     def _post(self, path, data):
-        logger.debug(f"TelegramBotClient._post: POST {path} {data}")
         return self._url_open("POST", path, data)
 
     def set_webhook(self, url, secret_token):
@@ -47,7 +46,6 @@ class TelegramBotClient:
 
         :return: `{'ok': True, 'result': True, 'description': 'Webhook was set'}`
         """
-        logger.info(f"TelegramBotClient.set_webhook: {url}")
         return self._post(
             "setWebhook",
             {

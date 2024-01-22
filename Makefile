@@ -1,7 +1,9 @@
 REGISTRY=ghcr.io/almazkun
 IMAGE_NAME=django-telegram-bot
 CONTAINER_NAME=django-telegram-bot
-VERSION=0.0.1
+VERSION=latest
+
+PIPENV=pipenv run python manage.py 
 
 .PHONY: help
 
@@ -29,11 +31,9 @@ lint:
 
 build:
 	docker build -t $(REGISTRY)/$(IMAGE_NAME):$(VERSION) .
-	docker tag $(REGISTRY)/$(IMAGE_NAME):$(VERSION) $(REGISTRY)/$(IMAGE_NAME):latest
 
 push:
 	docker push $(REGISTRY)/$(IMAGE_NAME):$(VERSION)
-	docker push $(REGISTRY)/$(IMAGE_NAME):latest
 
 run:
 	docker run \

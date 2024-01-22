@@ -24,7 +24,7 @@ class BotIn:
         return res
 
     def _handle_message(self, msg):
-        return f"Hello, {msg.sender}! How can I help you?"
+        return ""
 
     def _generate_response(self, msg) -> str:
         if self._is_command(msg.text):

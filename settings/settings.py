@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "dtb.apps.DtbConfig",
     "rest_framework",
+    "django_htmx",
 ]
 
 MIDDLEWARE = [
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 ROOT_URLCONF = "settings.urls"
@@ -136,6 +138,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "dtb.CustomUser"
 
 # Demo settings
+SUPERUSER_USERNAME = os.getenv("DJANGO_SUPERUSER_USERNAME")
+SUPERUSER_EMAIL = os.getenv("DJANGO_SUPERUSER_EMAIL")
+SUPERUSER_PASSWORD = os.getenv("DJANGO_SUPERUSER_PASSWORD")
 DEMO_BOT_TOKEN = os.getenv("DEMO_BOT_TOKEN")
 DEMO_DOMAIN = os.getenv("DEMO_DOMAIN")
 

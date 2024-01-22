@@ -1,22 +1,21 @@
-import logging
-
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
+    FormView,
     ListView,
     UpdateView,
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dtb.authentication import BotAuthentication
+from dtb.authentication import BotAuthentication, LoginReqMix
+from dtb.forms import BotCreateForm, LoginForm, SignUpForm
 from dtb.models import Bot, BotCommand, Chat
 from dtb.usecases.bot_in import BotIn
 from dtb.usecases.bot_out import BotOut
-
-logger = logging.getLogger(__name__)
 
 
 class BotWebhookView(APIView):
@@ -36,17 +35,48 @@ class BotWebhookView(APIView):
         return Response({"status": "ok"})
 
 
-class BotListView(ListView):
+class SignUpView(CreateView):
+    form_class = SignUpForm
+    template_name = "dtb/signup.html"
+    success_url = reverse_lazy("login")
+
+
+class MyLoginView(LoginView):
+    form_class = LoginForm
+    template_name = "dtb/login.html"
+    success_url = reverse_lazy("bot_list")
+
+
+class MyLogoutView(LoginReqMix, LogoutView):
+    def get_success_url(self):
+        return reverse_lazy("bot_list")
+
+
+class BotListCreateView(LoginReqMix, ListView, FormView):
     model = Bot
     template_name = "dtb/bot_list.html"
-    context_object_name = "bots"
-
-
-class BotCreateView(CreateView):
-    model = Bot
-    fields = ["name", "auth_token"]
-    template_name = "dtb/bot_create.html"
+    context_object_name = "bot_list"
+    form_class = BotCreateForm
     success_url = reverse_lazy("bot_list")
+
+    def form_valid(self, form):
+        form.user = self.request.user
+        form.domain = self.request.get_host()
+        print(form.__dict__)
+        form.save()
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        return super().post(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.request.user.bots.all()
+
+    def get_template_names(self) -> list[str]:
+        if self.request.htmx:
+            return ["dtb/includes/bot_list.html"]
+        return super().get_template_names()
 
 
 class BotDeleteView(DeleteView):

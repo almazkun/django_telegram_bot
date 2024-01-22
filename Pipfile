@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
+django-htmx = "*"
 
 [dev-packages]
 ruff = "*"
@@ -13,4 +14,4 @@ black = "*"
 djlint = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3"

@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -44,3 +45,7 @@ class BotAuthentication(BaseAuthentication):
             )
             raise AuthenticationFailed("Invalid " + self.auth_header)
         return (bot, None)
+
+
+class LoginReqMix(LoginRequiredMixin):
+    """This is to make sure that the user is logged in and shorter mixin name"""
