@@ -69,6 +69,18 @@ class Chat(ModelBase):
     def __str__(self):
         return str(self.chat_id)
 
+    @property
+    def sender(self):
+        return (
+            self.chat_info.get("first_name")
+            or self.chat_info.get("last_name")
+            or self.chat_info.get("username", "No Name")
+        )
+
+    class Meta:
+        unique_together = ("bot", "chat_id")
+        ordering = ("-updated_at",)
+
 
 class Message(ModelBase):
     text = models.TextField()

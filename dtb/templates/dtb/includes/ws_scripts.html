@@ -1,9 +1,7 @@
 <script>
-    let maxTry = 5;
-    const chatPk = "{{ chat.pk }}";
+    const chatPk = "{{ chat_selected.pk }}";
     const username = "{{ user.username }}";
-    const chatList = document.querySelector('#chat-list');
-    let chatLog = document.querySelector('#chat-log');
+    let chatLog = document.querySelector('#message-list');
     const scrollChatLog = () => {
             chatLog.scrollTop = chatLog.scrollHeight;
     };
@@ -13,16 +11,15 @@
     const appendMessage = (message, sender) => {
         const messageDiv = document.createElement('div');
         if (sender === username) {
-                messageDiv.classList.add('chat-bubble', 'user-message');
+                messageDiv.classList.add('chat-bubble', 'self');
                 messageDiv.innerText = message;
         } else if (sender === 'system') {
-                messageDiv.classList.add('chat-bubble', 'system-message');
+                messageDiv.classList.add('chat-bubble', 'system');
                 messageDiv.innerText = message;
         } else {
-                messageDiv.classList.add('chat-bubble', 'other-message');
+                messageDiv.classList.add('chat-bubble', 'other');
                 messageDiv.innerText = sender + ':\n' + message;
         }
-        
         chatLog.appendChild(messageDiv);
         scrollChatLog();
     };
@@ -44,11 +41,7 @@
             };
 
             chatSocket.onclose = function (e) {
-                    console.error('Chat socket closed unexpectedly. Reconnecting...');
-                    if (maxTry-- <= 0) {
-                            alert('Chat socket closed unexpectedly. Please refresh the page.');
-                    }
-                    setTimeout(connectWebSocket, 1000);
+                alert('Chat socket closed unexpectedly. Please refresh the page.');
             };
 
             chatMessageInput.focus();

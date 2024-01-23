@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-djangorestframework = "*"
-django-htmx = "*"
+channels = "==4.0.0"
+daphne = "==4.0.0"
+django = "==5.0.1"
+djangorestframework = "==3.14.0"
+django-htmx = "==1.17.2"
 
 [dev-packages]
 ruff = "*"

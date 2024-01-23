@@ -10,7 +10,6 @@ from dtb.views import (
     BotListCreateView,
     BotWebhookView,
     ChatDeleteView,
-    ChatDetailView,
     ChatListView,
     MessageListView,
     MyLoginView,
@@ -40,7 +39,6 @@ urlpatterns += [
 
 urlpatterns += [
     path("chats/<str:pk>/delete/", ChatDeleteView.as_view(), name="chat_delete"),
-    path("chats/<str:pk>/", ChatDetailView.as_view(), name="chat_detail"),
 ]
 
 urlpatterns += [

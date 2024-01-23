@@ -1,0 +1,14 @@
+<div id="chat-list" class="overflow-scroll" style="max-height:70dvh">
+    <ul class="list-group list-group-flush">
+        {% for chat in chat_list %}
+            <a href="{% url "message_list" chat.pk %}"
+               class="list-group-item list-group-item-action {% if chat_selected == chat %}active{% endif %} ">
+                {{ chat.sender }}
+            </a>
+        {% empty %}
+            <li class="list-group-item list-group-item-warning list-group-item-action">
+                No one started a conversation with your chat in Telegram yet.
+            </li>
+        {% endfor %}
+    </ul>
+</div>

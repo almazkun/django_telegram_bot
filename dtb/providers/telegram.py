@@ -6,6 +6,77 @@ from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
+class ChatType:
+    """
+    "chat": {
+        "id": 671559018,
+        "first_name": "Almaz",
+        "last_name": "Kunpeissov",
+        "username": "akundev",
+        "type": "private",
+    },
+    """
+
+    id: int
+    first_name: str
+    last_name: str
+    username: str
+    type: str
+
+
+class FromType:
+    """
+    "from": {
+        "id": 671559018,
+        "is_bot": False,
+        "first_name": "Almaz",
+        "last_name": "Kunpeissov",
+        "username": "akundev",
+        "language_code": "en",
+    },
+    """
+
+    id: int
+    is_bot: bool
+    first_name: str
+    last_name: str
+    username: str
+    language_code: str
+
+
+class MessageType:
+    """
+    "message": {
+        "message_id": 1,
+        "from": {
+            "id": 671559018,
+            "is_bot": False,
+            "first_name": "Almaz",
+            "last_name": "Kunpeissov",
+            "username": "akundev",
+            "language_code": "en",
+        },
+        "chat": {
+            "id": 671559018,
+            "first_name": "Almaz",
+            "last_name": "Kunpeissov",
+            "username": "akundev",
+            "type": "private",
+        },
+        "date": 1705554449,
+        "text": "/start",
+        "entities": [{"offset": 0, "length": 6, "type": "bot_command"}],
+    },
+    """
+
+    message_id: int
+    from_: FromType
+    chat: ChatType
+    date: int
+    text: str
+    entities: list[dict[str, int]]
+
+
 def run_in_executor(func):
     def wrapper(*args, **kwargs):
         return ThreadPoolExecutor().submit(func, *args, **kwargs)
@@ -14,12 +85,12 @@ def run_in_executor(func):
 
 
 class TelegramBotClient:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, auth_token):
+        self.auth_token = auth_token
 
     @run_in_executor
     def _url_open(self, method, path, data):
-        full_url = f"https://api.telegram.org/bot{self.token}/{path}"
+        full_url = f"https://api.telegram.org/bot{self.auth_token}/{path}"
         req = urllib.request.Request(full_url, method=method)
         req.add_header("Content-Type", "application/json; charset=utf-8")
         json_data = json.dumps(data)
@@ -29,7 +100,16 @@ class TelegramBotClient:
             f"TelegramBotClient._url_open: Sending request to {full_url}, data: {json_data}"
         )
         with urllib.request.urlopen(req, json_data, timeout=10) as f:
-            return json.loads(f.read().decode("utf-8"))
+            status_code = f.getcode()
+            response = f.read().decode("utf-8")
+            logger.debug(
+                f"TelegramBotClient._url_open: Received response {status_code} {response}"
+            )
+            if status_code != 200:
+                raise Exception(
+                    f"TelegramBotClient._url_open: {status_code} {response}"
+                )
+            return json.loads(response)
 
     def _post(self, path, data):
         return self._url_open("POST", path, data)

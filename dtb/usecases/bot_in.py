@@ -10,11 +10,16 @@ logger = logging.getLogger(__name__)
 class BotIn:
     def __init__(self, bot):
         self.bot = bot
+        self.bot_from = {
+            "id": str(bot.pk),
+            "is_bot": True,
+            "first_name": bot.name,
+        }
 
-    def _is_command(self, text):
+    def _is_command(self, text) -> bool:
         return text.startswith("/")
 
-    def _handle_command(self, msg):
+    def _handle_command(self, msg) -> str:
         command = msg.text.split()[0].lower()
         res = self.bot.commands.get(command=command).response
         if "{text}" in res:
@@ -24,12 +29,23 @@ class BotIn:
         return res
 
     def _handle_message(self, msg):
-        return ""
+        res = f"Hello, {msg.sender}! I'm {self.bot_from['first_name']}."
+        return msg.chat.messages.create(
+            text=res,
+            from_user=self.bot_from,
+            message_info=msg.message_info,
+        ).text
 
     def _generate_response(self, msg) -> str:
-        if self._is_command(msg.text):
-            return self._handle_command(msg)
-        return self._handle_message(msg)
+        try:
+            if self._is_command(msg.text):
+                return self._handle_command(msg)
+            return self._handle_message(msg)
+        except ObjectDoesNotExist:
+            return "Sorry, I don't understand."
+        except Exception as e:
+            logger.exception(e)
+            return "Sorry, something went wrong! Please try again later."
 
     def reply(self, message) -> str:
         chat_info = message.pop("chat", {})
@@ -45,10 +61,4 @@ class BotIn:
             from_user=from_user,
             message_info=message,
         )
-        try:
-            return chat.chat_id, self._generate_response(msg)
-        except ObjectDoesNotExist:
-            return f"Sorry, `{text}` command is not found."
-        except Exception as e:
-            logger.exception(e)
-            return chat.chat_id, "Sorry, something went wrong! Please try again later."
+        return chat.chat_id, self._generate_response(msg)

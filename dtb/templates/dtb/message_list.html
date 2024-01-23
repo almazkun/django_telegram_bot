@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% block main_content %}
+    <div class="container">
+        {% include "includes/back_btn.html" %}
+        <h1 class="display-5">Chat with {{ chat.sender }}</h1>
+        <p class="lead">History of your conversation</p>
+        <div class="row">
+            <div class="col-md-3">{% include "dtb/includes/chat_list.html" %}</div>
+            <div class="col-md-9">{% include "dtb/includes/message_list.html" %}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

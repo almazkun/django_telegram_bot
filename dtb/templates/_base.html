@@ -6,6 +6,9 @@
         {% endblock meta %}
     </head>
     <body class="d-flex flex-column h-100">
+        {% block progress %}
+            {% include "includes/progress.html" %}
+        {% endblock progress %}
         {% block navigation %}
             {% include "includes/nav.html" %}
         {% endblock navigation %}
@@ -18,7 +21,7 @@
         {% block scripts %}
             {% include "includes/scripts.html" %}
         {% endblock scripts %}
-        {% block js_scripts %}
-        {% endblock js_scripts %}
+        {% block additional_scripts %}
+        {% endblock additional_scripts %}
     </body>
 </html>

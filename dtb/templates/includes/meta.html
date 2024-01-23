@@ -6,31 +6,106 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous">
 <style>      
-    .chat-bubble {
+    .chat-message {
         display: inline-block;
         padding: 0.5rem;
-        margin-bottom: 0.5rem;
         width: 100%;
         word-wrap: break-word;
     }
 
-    .system-message {
-        color: #6C757D;
-        text-align: center;
-    }
-
-    .user-message {
+    .chat-message.self {
         border-right: 1px solid #007BFF;
         text-align: right;
     }
 
-    .other-message {
+    .chat-message.other {
         border-left: 1px solid #28A745;
         text-align: left;
     }
 
-    .undefined-message {
-        color: #FFC107;
-        text-align: center;
+    /* Progress bar */
+    .progress {
+        height: 2px;
+        width: 100%;
+        border-radius: 2px;
+        background-clip: padding-box;
+        overflow: hidden;
+        position: absolute;
+    }
+
+    .progress {
+        opacity: 0;
+    }
+
+    .htmx-request .progress {
+        opacity: 1;
+    }
+
+    .htmx-request.progress {
+        opacity: 1;
+    }
+
+    .progress .indeterminate {
+        background-color: orange;
+    }
+
+    .progress .indeterminate:before {
+        content: '';
+        position: absolute;
+        background-color: inherit;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        will-change: left, right;
+        -webkit-animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+        animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    }
+
+    .progress .indeterminate:after {
+        content: '';
+        position: absolute;
+        background-color: inherit;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        will-change: left, right;
+        -webkit-animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+        animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+        -webkit-animation-delay: 1.15s;
+        animation-delay: 1.15s;
+    }
+
+    @keyframes indeterminate {
+        0% {
+            left: -35%;
+            right: 100%;
+        }
+
+        60% {
+            left: 100%;
+            right: -90%;
+        }
+
+        100% {
+            left: 100%;
+            right: -90%;
+        }
+    }
+
+    @keyframes indeterminate-short {
+        0% {
+            left: -200%;
+            right: 100%;
+        }
+
+        60% {
+            left: 107%;
+            right: -8%;
+        }
+
+        100% {
+            left: 107%;
+            right: -8%;
+        }
     }
 </style>

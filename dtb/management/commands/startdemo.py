@@ -31,9 +31,12 @@ class Command(BaseCommand):
 
     def _create_demo_bot(self):
         self.stdout.write(self.style.SUCCESS("Creating demo bot"))
-        BotCreate(DOMAIN, "Demo Bot", BOT_TOKEN, self.admin).perform()
+        bot = BotCreate(BOT_TOKEN).perform(
+            name="Demo Bot", auth_token=BOT_TOKEN, user=self.admin, domain=DOMAIN
+        )
         self.stdout.write(
             self.style.SUCCESS(
-                f"Demo bot is created. Check out {DOMAIN} to see it in action."
+                f"Bot created: {bot.name} ({bot.auth_token})\n"
+                f"Webhook set: {DOMAIN}{bot.get_absolute_url()}\n"
             )
         )

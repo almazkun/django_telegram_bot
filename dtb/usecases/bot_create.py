@@ -1,4 +1,7 @@
 """This module performs the use case of creating a bot."""
+from django.contrib.auth import get_user_model
+
+from dtb.models import Bot
 from dtb.usecases.bot_out import BotOut
 
 START_RESPONSE = """
@@ -33,45 +36,39 @@ There is nothing to change yet.
 
 
 class BotCreate:
-    def __init__(self, domain, bot_name, bot_token, user):
-        self.domain = domain
-        self.bot_name = bot_name
-        self.bot_token = bot_token
-        self.user = user
-        self.bot = None
+    def __init__(self, auth_token):
+        self.bot_out = BotOut(auth_token)
 
-    def _create_bot(self):
-        if not self.bot:
-            self.bot = self.user.bots.get_or_create(
-                name=self.bot_name, auth_token=self.bot_token
-            )[0]
-        return self.bot
+    def _create_bot(self, name=str, auth_token=str, user=get_user_model()) -> Bot:
+        return user.bots.create(name=name, auth_token=auth_token)
 
-    def _create_webhook(self):
-        return (
-            BotOut(self.bot)
-            .set_webhook(
-                f"{self.domain}{self.bot.get_absolute_url()}", self.bot.secret_token
-            )
-            .result()
-        )
+    def _create_webhook(self, url=str, secret_token=str) -> dict:
+        return self.bot_out.set_webhook(url=url, secret_token=secret_token)
 
-    def _create_start_command(self):
-        self.bot.commands.get_or_create(
+    def _create_start_commands(self, bot=Bot) -> None:
+        bot.commands.get_or_create(
             command="/start", defaults={"response": START_RESPONSE}
         )
-        self.bot.commands.get_or_create(
+        bot.commands.get_or_create(
             command="/help", defaults={"response": HELP_RESPONSE}
         )
-        self.bot.commands.get_or_create(
+        bot.commands.get_or_create(
             command="/echo", defaults={"response": ECHO_RESPONSE}
         )
-        self.bot.commands.get_or_create(
+        bot.commands.get_or_create(
             command="/settings", defaults={"response": SETTINGS_RESPONSE}
         )
 
-    def perform(self):
-        self._create_bot()
-        self._create_webhook()
-        self._create_start_command()
-        return self.bot
+    def perform(self, name=str, auth_token=str, user=get_user_model(), domain=str):
+        bot = self._create_bot(name, auth_token, user)
+        self._create_webhook(
+            url=f"{domain}{bot.get_absolute_url()}", secret_token=bot.secret_token
+        )
+        self._create_start_commands(bot=bot)
+        return bot
+
+    def validate(self):
+        try:
+            return self.bot_out.get_webhook_info()
+        except Exception as e:
+            raise e
