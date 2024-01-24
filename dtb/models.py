@@ -78,7 +78,6 @@ class Chat(ModelBase):
         )
 
     class Meta:
-        unique_together = ("bot", "chat_id")
         ordering = ("-updated_at",)
 
 

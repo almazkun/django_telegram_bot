@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -14,8 +15,8 @@ from rest_framework.views import APIView
 from dtb.authentication import BotAuthentication, LoginReqMix
 from dtb.forms import BotCreateForm, LoginForm, SignUpForm
 from dtb.models import Bot, BotCommand, Chat
-from dtb.usecases.bot_in import BotIn
 from dtb.usecases.bot_out import BotOut
+from dtb.usecases.msg_in import MsgIn
 
 
 class BotWebhookView(APIView):
@@ -28,10 +29,8 @@ class BotWebhookView(APIView):
         if not message:
             return Response({"status": "ok"})
 
-        bot_out = BotOut(bot.auth_token)
-        bot_out.send_typing(message["chat"]["id"])
-        chat_id, response = BotIn(bot).reply(message)
-        bot_out.send_message(chat_id, response)
+        BotOut(bot.auth_token).send_typing(message["chat"]["id"])
+        MsgIn().accept_telegram_message(bot, message)
         return Response({"status": "ok"})
 
 
@@ -61,7 +60,7 @@ class BotListCreateView(LoginReqMix, ListView, FormView):
 
     def form_valid(self, form):
         form.user = self.request.user
-        form.domain = self.request.get_host()
+        form.domain = settings.DEMO_DOMAIN
         form.save()
         return super().form_valid(form)
 

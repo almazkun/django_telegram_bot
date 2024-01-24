@@ -2,7 +2,7 @@ FROM python:3.12-alpine as builder
 
 WORKDIR /app
 
-RUN pip install pipenv daphne
+RUN pip install pipenv
 
 COPY Pipfile Pipfile.lock ./
 

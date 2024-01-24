@@ -44,10 +44,12 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
     "django.contrib.staticfiles",
     "dtb.apps.DtbConfig",
     "rest_framework",
     "django_htmx",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -133,6 +135,11 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Channels
+ASGI_APPLICATION = "settings.asgi.application"
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
 
 # Custom User model
 AUTH_USER_MODEL = "dtb.CustomUser"

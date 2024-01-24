@@ -19,3 +19,8 @@
               aria-describedby="send-button"></textarea>
     <button id="send-button" class="btn btn-outline-warning" type="button">Send</button>
 </div>
+{% if chat_selected %}
+    {% block additional_scripts %}
+        {% include "dtb/includes/ws_scripts.html" %}
+    {% endblock %}
+{% endif %}

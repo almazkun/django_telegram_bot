@@ -63,5 +63,14 @@ migrate:
 startdemo:
 	docker exec $(CONTAINER_NAME) python manage.py startdemo
 
-runserver:
-	pipenv run python manage.py runserver
+mng:
+	pipenv run python manage.py $(cmd)
+
+mng-migrate:
+	@make mng cmd="migrate"
+
+mng-startdemo:
+	@make mng cmd="startdemo"
+
+mng-runserver:
+	@make mng cmd="runserver"

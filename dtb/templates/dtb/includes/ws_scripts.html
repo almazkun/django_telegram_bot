@@ -1,26 +1,32 @@
 <script>
+    let maxTry = 3;
     const chatPk = "{{ chat_selected.pk }}";
     const username = "{{ user.username }}";
-    let chatLog = document.querySelector('#message-list');
+    const messageList = document.querySelector('#message-list');
     const scrollChatLog = () => {
-            chatLog.scrollTop = chatLog.scrollHeight;
+        messageList.scrollTop = messageList.scrollHeight;
     };
     const chatMessageInput = document.querySelector('#chat-message-input');
     const chatSendButton = document.querySelector('#send-button');
 
-    const appendMessage = (message, sender) => {
+    const appendMessage = (type, text, sender) => {
         const messageDiv = document.createElement('div');
-        if (sender === username) {
-                messageDiv.classList.add('chat-bubble', 'self');
-                messageDiv.innerText = message;
-        } else if (sender === 'system') {
-                messageDiv.classList.add('chat-bubble', 'system');
-                messageDiv.innerText = message;
+        if (type === 'system_notification') {
+                messageDiv.classList.add('chat-message', "system", "small", "text-muted");
+                messageDiv.innerText = text;
+        } else if (type === 'bot_message') {
+                messageDiv.classList.add('chat-message', "bot");
+                messageDiv.innerText = sender + ':\n' + text;
         } else {
-                messageDiv.classList.add('chat-bubble', 'other');
-                messageDiv.innerText = sender + ':\n' + message;
+                if (sender === username) {
+                        messageDiv.classList.add('chat-message', 'self');
+                        messageDiv.innerText = text;
+                } else {
+                        messageDiv.classList.add('chat-message', 'other');
+                        messageDiv.innerText = sender + ':\n' + text;
+                }
         }
-        chatLog.appendChild(messageDiv);
+        messageList.appendChild(messageDiv);
         scrollChatLog();
     };
 
@@ -37,11 +43,20 @@
 
             chatSocket.onmessage = function (e) {
                     const data = JSON.parse(e.data);
-                    appendMessage(data.message, data.sender);
+                    appendMessage(data.type, data.text, data.sender);
             };
 
             chatSocket.onclose = function (e) {
-                alert('Chat socket closed unexpectedly. Please refresh the page.');
+                // reconnect
+                        console.error('Chat socket closed unexpectedly');
+                        if (maxTry > 0) {
+                                setTimeout(connectWebSocket, 1000);
+                                maxTry--;
+                        } else {
+                                appendMessage('system_notification', 'Chat socket closed unexpectedly. Please refresh the page.');
+                        }
+
+
             };
 
             chatMessageInput.focus();
@@ -52,12 +67,12 @@
             };
 
             chatSendButton.onclick = function (e) {
-                    const message = chatMessageInput.value;
-                    if (message.trim() === '') {
+                    const text = chatMessageInput.value;
+                    if (text.trim() === '') {
                             return;
                     }
                     chatSocket.send(JSON.stringify({
-                            'message': message
+                            'text': text
                     }));
                     chatMessageInput.value = '';
             };
