@@ -11,6 +11,7 @@
 
     const appendMessage = (type, text, sender) => {
         const messageDiv = document.createElement('div');
+
         if (type === 'system_notification') {
                 messageDiv.classList.add('chat-message', "system", "small", "text-muted");
                 messageDiv.innerText = text;
@@ -23,7 +24,13 @@
                         messageDiv.innerText = text;
                 } else {
                         messageDiv.classList.add('chat-message', 'other');
-                        messageDiv.innerText = sender + ':\n' + text;
+                        const senderSpan = document.createElement('span');
+                        const br = document.createElement('br');
+                        senderSpan.classList.add('small', 'text-muted');
+                        senderSpan.innerText = sender + ':';
+                        messageDiv.appendChild(senderSpan);
+                        messageDiv.appendChild(br);
+                        messageDiv.appendChild(document.createTextNode(text));
                 }
         }
         messageList.appendChild(messageDiv);

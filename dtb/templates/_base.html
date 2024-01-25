@@ -16,8 +16,9 @@
             {% block main_content %}
             {% endblock main_content %}
         </main>
-        <footer class="navbar bg-dark fixed-bottom">
-        </footer>
+        {% block footer %}
+            {% include "includes/footer.html" %}
+        {% endblock footer %}
         {% block scripts %}
             {% include "includes/scripts.html" %}
         {% endblock scripts %}

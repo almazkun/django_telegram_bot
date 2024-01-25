@@ -2,6 +2,7 @@ REGISTRY=ghcr.io/almazkun
 IMAGE_NAME=django-telegram-bot
 CONTAINER_NAME=django-telegram-bot
 VERSION=latest
+k=./
 
 PIPENV=pipenv run python manage.py 
 
@@ -64,7 +65,7 @@ startdemo:
 	docker exec $(CONTAINER_NAME) python manage.py startdemo
 
 mng:
-	pipenv run python manage.py $(cmd)
+	pipenv run python manage.py $(cmd) $(args)
 
 mng-migrate:
 	@make mng cmd="migrate"
@@ -74,3 +75,6 @@ mng-startdemo:
 
 mng-runserver:
 	@make mng cmd="runserver"
+
+mng-test:
+	@make mng cmd="test" args="$(k)"

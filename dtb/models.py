@@ -70,7 +70,9 @@ class Chat(ModelBase):
         return str(self.chat_id)
 
     @property
-    def sender(self):
+    def name(self):
+        if self.chat_id.startswith("-"):
+            return self.chat_info.get("title", "No Name")
         return (
             self.chat_info.get("first_name")
             or self.chat_info.get("last_name")

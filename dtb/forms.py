@@ -1,9 +1,13 @@
+import logging
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from dtb.models import Bot
 from dtb.usecases.bot_create import BotCreate
+
+logger = logging.getLogger(__name__)
 
 
 class BootstrapFormMixin:
@@ -28,44 +32,35 @@ class SignUpForm(BootstrapFormMixin, UserCreationForm):
 
 
 class BotCreateForm(BootstrapFormMixin, forms.ModelForm):
-    name = forms.CharField(
-        label="Bot Name",
-        widget=forms.TextInput(attrs={"placeholder": "My Bot"}),
-        required=True,
-        help_text="This name will be displayed in the list of your bots",
-    )
     auth_token = forms.CharField(
         label="Auth Token",
         widget=forms.TextInput(
             attrs={"placeholder": "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"}
         ),
         required=True,
-        help_text="You can get it from <a href='https://t.me/BotFather'>BotFather</a>",
+        help_text="You can get it from <a href='https://t.me/BotFather'>@BotFather</a>",
     )
 
     class Meta:
         model = Bot
-        fields = ("name", "auth_token")
+        fields = ("auth_token",)
 
     def clean_auth_token(self):
+        auth_token = self.cleaned_data["auth_token"]
         try:
-            auth_token = self.cleaned_data["auth_token"]
             self.bot_create = BotCreate(auth_token)
-            self.bot_create.validate().result()
-        except Exception:
-            raise forms.ValidationError("Invalid auth token")
+            self.bot_create._get_me()
+        except Exception as e:
+            logger.exception(e)
+            raise forms.ValidationError("Invalid auth token.")
         return auth_token
 
     def save(self, commit=True):
         try:
-            return self.bot_create.perform(
-                name=self.cleaned_data["name"],
-                auth_token=self.cleaned_data["auth_token"],
+            self.bot_create.perform(
                 user=self.user,
                 domain=self.domain,
             )
-        except Exception:
-            Bot.objects.filter(
-                created_by=self.user, auth_token=self.cleaned_data["auth_token"]
-            ).delete()
-            raise forms.ValidationError("Something went wrong, please try again later")
+        except Exception as e:
+            logger.exception(e)
+            raise forms.ValidationError("Something went wrong.")

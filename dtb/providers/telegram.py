@@ -6,77 +6,6 @@ from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
-class ChatType:
-    """
-    "chat": {
-        "id": 671559018,
-        "first_name": "Almaz",
-        "last_name": "Kunpeissov",
-        "username": "akundev",
-        "type": "private",
-    },
-    """
-
-    id: int
-    first_name: str
-    last_name: str
-    username: str
-    type: str
-
-
-class FromType:
-    """
-    "from": {
-        "id": 671559018,
-        "is_bot": False,
-        "first_name": "Almaz",
-        "last_name": "Kunpeissov",
-        "username": "akundev",
-        "language_code": "en",
-    },
-    """
-
-    id: int
-    is_bot: bool
-    first_name: str
-    last_name: str
-    username: str
-    language_code: str
-
-
-class MessageType:
-    """
-    "message": {
-        "message_id": 1,
-        "from": {
-            "id": 671559018,
-            "is_bot": False,
-            "first_name": "Almaz",
-            "last_name": "Kunpeissov",
-            "username": "akundev",
-            "language_code": "en",
-        },
-        "chat": {
-            "id": 671559018,
-            "first_name": "Almaz",
-            "last_name": "Kunpeissov",
-            "username": "akundev",
-            "type": "private",
-        },
-        "date": 1705554449,
-        "text": "/start",
-        "entities": [{"offset": 0, "length": 6, "type": "bot_command"}],
-    },
-    """
-
-    message_id: int
-    from_: FromType
-    chat: ChatType
-    date: int
-    text: str
-    entities: list[dict[str, int]]
-
-
 def run_in_executor(func):
     def wrapper(*args, **kwargs):
         return ThreadPoolExecutor().submit(func, *args, **kwargs)
@@ -134,25 +63,6 @@ class TelegramBotClient:
                 "secret_token": secret_token,
             },
         )
-
-    def get_webhook_info(self):
-        """https://core.telegram.org/bots/api#getwebhookinfo
-
-        POST https://api.telegram.org/bot{token}/getWebhookInfo
-
-        :return: ```{
-                'ok': True,
-                'result': {
-                    'url': 'https://1461-211-63-197-84.ngrok-free.app//api/v1/bot/webhook/5f59d15a-d3f7-44b7-a8b9-9c4a611b5866/',
-                    'has_custom_certificate': False,
-                    'pending_update_count': 0,
-                    'max_connections': 40,
-                    'ip_address': '3.125.223.134',
-                    'allowed_updates': ['message']
-                    }
-                }```
-        """
-        return self._post("getWebhookInfo", {})
 
     def send_message(self, chat_id, text):
         """https://core.telegram.org/bots/api#sendmessage
@@ -212,3 +122,22 @@ class TelegramBotClient:
                 "action": "typing",
             },
         )
+
+    def get_me(self):
+        """https://core.telegram.org/bots/api
+        POST https://api.telegram.org/bot{token}/getMe
+
+        :return: ```{
+            "ok": True,
+            "result": {
+                "id": 6793918636,
+                "is_bot": True,
+                "first_name": "Akundev",
+                "username": "akundev_bot",
+                "can_join_groups": True,
+                "can_read_all_group_messages": True,
+                "supports_inline_queries": False,
+            },
+        }```
+        """
+        return self._post("getMe", {})

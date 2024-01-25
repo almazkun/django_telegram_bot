@@ -1,8 +1,12 @@
 """This module performs the use case of creating a bot."""
+import logging
+
 from django.contrib.auth import get_user_model
 
 from dtb.models import Bot
 from dtb.usecases.bot_out import BotOut
+
+logger = logging.getLogger(__name__)
 
 START_RESPONSE = """
 Hello, {name}!
@@ -35,15 +39,37 @@ There is nothing to change yet.
 """
 
 
+class AuthTokenValidationError(Exception):
+    pass
+
+
 class BotCreate:
     def __init__(self, auth_token):
+        self.auth_token = auth_token
         self.bot_out = BotOut(auth_token)
+        self.name_ = None
 
-    def _create_bot(self, name=str, auth_token=str, user=get_user_model()) -> Bot:
-        return user.bots.create(name=name, auth_token=auth_token)
+    def _get_me(self):
+        try:
+            self.name_ = self.bot_out.get_me().result().get("result").get("first_name")
+            return self.name_
+        except Exception as e:
+            logger.exception(e)
+            raise e
 
-    def _create_webhook(self, url=str, secret_token=str) -> dict:
-        return self.bot_out.set_webhook(url=url, secret_token=secret_token)
+    @property
+    def name(self):
+        if not self.name_:
+            self._get_me()
+        return self.name_
+
+    def _create_bot(self, user=get_user_model()) -> Bot:
+        return user.bots.create(name=self.name, auth_token=self.auth_token)
+
+    def _create_webhook(self, bot=Bot, domain=str) -> dict:
+        return self.bot_out.set_webhook(
+            url=f"{domain}{bot.get_absolute_url()}", secret_token=bot.secret_token
+        )
 
     def _create_start_commands(self, bot=Bot) -> None:
         bot.commands.get_or_create(
@@ -59,16 +85,11 @@ class BotCreate:
             command="/settings", defaults={"response": SETTINGS_RESPONSE}
         )
 
-    def perform(self, name=str, auth_token=str, user=get_user_model(), domain=str):
-        bot = self._create_bot(name, auth_token, user)
-        self._create_webhook(
-            url=f"{domain}{bot.get_absolute_url()}", secret_token=bot.secret_token
-        )
+    def perform(self, user=get_user_model(), domain=str):
+        bot = self._create_bot(user)
+        self._create_webhook(bot, domain)
         self._create_start_commands(bot=bot)
         return bot
 
     def validate(self):
-        try:
-            return self.bot_out.get_webhook_info()
-        except Exception as e:
-            raise e
+        return self._get_me()

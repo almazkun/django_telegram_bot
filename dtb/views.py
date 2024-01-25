@@ -30,7 +30,9 @@ class BotWebhookView(APIView):
             return Response({"status": "ok"})
 
         BotOut(bot.auth_token).send_typing(message["chat"]["id"])
-        MsgIn().accept_telegram_message(bot, message)
+        msg_in = MsgIn()
+        msg_in.accept_telegram_message(bot, message)
+        msg_in.generate_response()
         return Response({"status": "ok"})
 
 

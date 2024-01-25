@@ -9,11 +9,11 @@ class BotOut:
     def __init__(self, auth_token):
         self.client = self.client(auth_token)
 
+    def get_me(self):
+        return self.client.get_me()
+
     def set_webhook(self, url, secret_token):
         return self.client.set_webhook(url, secret_token)
-
-    def get_webhook_info(self):
-        return self.client.get_webhook_info()
 
     def send_message(self, chat_id, text):
         return self.client.send_message(chat_id, text)

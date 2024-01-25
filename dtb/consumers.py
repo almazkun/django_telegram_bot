@@ -3,6 +3,7 @@ import logging
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
+from dtb.cacher import ActiveUserCache
 from dtb.models import Chat
 from dtb.usecases.msg_in import MsgIn
 
@@ -25,17 +26,23 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
 
         self.group_name = self.chat_pk
+        self.cache = ActiveUserCache(self.group_name)
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
+
+        self.cache.increment()
         await self.accept()
 
     async def disconnect(self, close_code):
+        self.cache.decrement()
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def receive_json(self, content: dict):
-        await database_sync_to_async(MsgIn().accept_websocket_message)(
+        msg_in = MsgIn()
+        await database_sync_to_async(msg_in.accept_websocket_message)(
             self.user, self.chat, content["text"]
         )
+        await database_sync_to_async(msg_in.generate_response)()
 
     async def chat_message(self, event: dict):
         await self.send_json({"type": "chat_message", **event})

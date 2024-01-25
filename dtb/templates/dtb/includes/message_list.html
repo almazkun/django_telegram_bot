@@ -1,23 +1,31 @@
-<div id="message-list" class="overflow-scroll" style="height:70dvh">
+<div id="message-list"
+     class="overflow-scroll mb-4 border"
+     style="height:65dvh">
     {% for message in message_list %}
-        <div class="chat-message {% if message.sender == user.username %}self{% else %}other{% endif %}">
-            {{ message.sender }}:
-            <br>
-            {{ message.text }}
-        </div>
+        {% if message.sender == user.username %}
+            <div class="chat-message self">{{ message.text }}</div>
+        {% else %}
+            <div class="chat-message other">
+                <span class="small text-muted">{{ message.sender }}:</span>
+                <br>
+                {{ message.text }}
+            </div>
+        {% endif %}
     {% empty %}
-        <p>No messages yet.</p>
+        <div class="chat-message system small text-muted">No messages yet.</div>
     {% endfor %}
 </div>
-<div class="input-group my-4">
+<div class="input-group mb-5">
     <textarea type="text"
               rows="1"
               id="chat-message-input"
-              class="form-control"
+              class="form-control  rounded-0"
               placeholder="Type your message..."
               aria-label="Type your message..."
               aria-describedby="send-button"></textarea>
-    <button id="send-button" class="btn btn-outline-warning" type="button">Send</button>
+    <button id="send-button"
+            class="btn btn-outline-warning  rounded-0"
+            type="button">Send</button>
 </div>
 {% if chat_selected %}
     {% block additional_scripts %}

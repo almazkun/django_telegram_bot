@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from dtb.cacher import ActiveUserCache
 from dtb.models import Bot, Chat, CustomUser, Message
 from dtb.types import TelegramMessage
 from dtb.usecases.msg_out import MsgOut
@@ -23,7 +24,7 @@ class Provider(ABC):
 class TelegramProvider(Provider):
     def save(self, incoming_message: dict):
         self.bot = incoming_message["bot"]
-        msg = incoming_message["msg"]
+        msg = incoming_message["msg"].copy()
         chat_info = msg.pop("chat", {})
         text = msg.pop("text", "")
         from_user = msg.pop("from", {})
@@ -63,7 +64,9 @@ class TelegramProvider(Provider):
         return res
 
     def _handle_message(self, message: Message) -> str:
-        return ""
+        active_admins = ActiveUserCache(str(self.chat.pk)).get()
+        if not active_admins:
+            return "Sorry, no admins are currently online. You may find help at /start."
 
     def _generate_response(self, message: Message) -> str:
         try:
@@ -105,7 +108,6 @@ class MsgIn:
 
     def accept_telegram_message(self, bot: Bot, msg: TelegramMessage):
         self.incoming_message = {"provider": "telegram", "bot": bot, "msg": msg}
-        self.generate_response()
 
     def accept_websocket_message(self, user: CustomUser, chat: Chat, text: str):
         self.incoming_message = {
@@ -114,7 +116,6 @@ class MsgIn:
             "chat": chat,
             "text": text,
         }
-        self.generate_response()
 
     def save_message(self):
         self.provider = (

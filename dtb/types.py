@@ -2,19 +2,48 @@
 from typing import Any, Dict, List, Optional
 
 
-class Chat:
-    """This class defines the structure of a Telegram chat"""
+class ChatType:
+    """ "chat":
+    {
+        "id": 671559018,
+        "first_name": "Almaz",
+        "last_name": "Kunpeissov",
+        "username": "akundev",
+        "type": "private"
+    }"""
 
     id: int
-    type: str
-    title: Optional[str] = None
-    username: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    username: Optional[str] = None
+    type: str
 
 
-class FromUser:
-    """This class defines the structure of a Telegram user"""
+class GroupChatType:
+    """ "chat":
+    {
+        "id": -4121165875,
+        "title": "Almaz, Akundev",
+        "type": "group",
+        "all_members_are_administrators": True,
+    }"""
+
+    id: int
+    title: Optional[str] = None
+    type: str
+    all_members_are_administrators: Optional[bool] = None
+
+
+class FromType:
+    """ "from":
+    {
+        "id": 671559018,
+        "is_bot": False,
+        "first_name": "Almaz",
+        "last_name": "Kunpeissov",
+        "username": "akundev",
+        "language_code": "en"
+    }"""
 
     id: int
     is_bot: bool
@@ -25,14 +54,57 @@ class FromUser:
 
 
 class TelegramMessage:
-    """This class defines the structure of a Telegram message"""
+    """{
+        "message_id": 1,
+        "from": {
+            "id": 671559018,
+            "is_bot": False,
+            "first_name": "Almaz",
+            "last_name": "Kunpeissov",
+            "username": "akundev",
+            "language_code": "en",
+        },
+        "chat": {
+            "id": 671559018,
+            "first_name": "Almaz",
+            "last_name": "Kunpeissov",
+            "username": "akundev",
+            "type": "private",
+        },
+        "date": 1705554449,
+        "text": "/start",
+        "entities": [{"offset": 0, "length": 6, "type": "bot_command"}]
+    }"""
 
     message_id: int
-    from_user: FromUser
-    chat: Chat
+    from_: FromType
+    chat: ChatType
     date: int
     text: Optional[str] = None
     entities: Optional[List[Dict[str, Any]]] = None
+
+
+class TelegramChatMessage:
+    """{
+        "message_id": 416,
+        "from": {
+            "id": 671559018,
+            "is_bot": False,
+            "first_name": "Almaz",
+            "last_name": "Kunpeissov",
+            "username": "akundev",
+            "language_code": "en",
+        },
+        "chat": {
+            "id": -4121165875,
+            "title": "Almaz, Akundev",
+            "type": "group",
+            "all_members_are_administrators": True,
+        },
+        "date": 1706157428,
+        "text": "/start",
+        "entities": [{"offset": 0, "length": 6, "type": "bot_command"}],
+    }"""
 
 
 class WsTypes:
@@ -44,7 +116,13 @@ class WsTypes:
 
 
 class WebsocketMessage:
-    """This class defines the structure of a Websocket message"""
+    """
+    {
+        "sender": "Almaz",
+        "text": "Hello, WebSocket!",
+        "type": "chat_message"
+    }
+    """
 
     sender: str
     text: str
