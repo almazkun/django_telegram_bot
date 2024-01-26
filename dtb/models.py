@@ -101,6 +101,11 @@ class Message(ModelBase):
             or self.from_user.get("username", "No Name")
         )
 
+    def save(self, *args, **kwargs):
+        self.chat.updated_at = self.updated_at
+        self.chat.save()
+        super().save(*args, **kwargs)
+
 
 class BotCommand(ModelBase):
     command = models.CharField(

@@ -7,6 +7,7 @@ from dtb.views import (
     BotCmdListView,
     BotCmdUpdateView,
     BotDeleteView,
+    BotDetailView,
     BotListCreateView,
     BotWebhookView,
     ChatDeleteView,
@@ -34,6 +35,7 @@ urlpatterns += [
     path("bots/<str:pk>/cmds/", BotCmdListView.as_view(), name="bot_cmd_list"),
     path("bots/<str:pk>/chats/", ChatListView.as_view(), name="chat_list"),
     path("bots/<str:pk>/delete/", BotDeleteView.as_view(), name="bot_delete"),
+    path("bots/<str:pk>/", BotDetailView.as_view(), name="bot_detail"),
     path("", BotListCreateView.as_view(), name="bot_list"),
 ]
 

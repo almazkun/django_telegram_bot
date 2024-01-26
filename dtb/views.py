@@ -1,5 +1,8 @@
+from typing import Any
+
 from django.conf import settings
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -77,6 +80,20 @@ class BotListCreateView(LoginReqMix, ListView, FormView):
         if self.request.htmx:
             return ["dtb/includes/bot_list.html"]
         return super().get_template_names()
+
+
+class BotDetailView(LoginReqMix, DetailView):
+    model = Bot
+    template_name = "dtb/bot_detail.html"
+    context_object_name = "bot"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.request.user.bots.all().prefetch_related("commands")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["command_list"] = self.object.commands.all()
+        return context
 
 
 class BotDeleteView(LoginReqMix, DeleteView):

@@ -1,15 +1,18 @@
 {% extends "_base.html" %}
 {% block main_content %}
     <div class="container">
-        {% url "bot_list" as prev_page %}
-        {% include "includes/back_btn.html" %}
         {% if bot %}
             <h1 class="display-5">{{ bot.name }}</h1>
-            <p class="lead">Select a chat to view the conversation</p>
+            <p class="lead mb-0">Select a chat to view the conversation</p>
+            {% url "bot_list" as prev_page %}
+            {% url "bot_detail" bot.pk as settings_page %}
         {% elif chat_selected %}
             <h1 class="display-5 text-truncate">Chat with {{ chat_selected.name }}</h1>
-            <p class="lead">History of your conversation</p>
+            <p class="lead mb-0">History of your conversation</p>
+            {% url "message_list" chat_selected.pk as prev_page %}
+            {% url "bot_detail" chat_selected.bot.pk as settings_page %}
         {% endif %}
+        {% include "dtb/includes/sub_nav.html" %}
         <div class="row">
             <div class="col-md-3">{% include "dtb/includes/chat_list.html" %}</div>
             <div class="col-md-9">

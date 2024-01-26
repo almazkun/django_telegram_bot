@@ -1,0 +1,10 @@
+{% extends "_base.html" %}
+{% block main_content %}
+    <div class="container">
+        {% if bot %}
+            {% include "dtb/includes/bot_detail.html" %}
+        {% elif chat_selected %}
+            {% include "dtb/includes/chat_detail.html" %}
+        {% endif %}
+    </div>
+{% endblock %}
