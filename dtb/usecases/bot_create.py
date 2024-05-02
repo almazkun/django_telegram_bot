@@ -1,4 +1,5 @@
 """This module performs the use case of creating a bot."""
+
 import logging
 
 from django.contrib.auth import get_user_model

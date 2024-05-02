@@ -99,9 +99,11 @@ class Command(BaseCommand):
                 chat = bot.chats.create(
                     chat_id=f"chat_id{i}",
                     chat_info={
-                        "first_name": self.admin.username
-                        if i % 2
-                        else f"User {i} very long name he is a very good user",
+                        "first_name": (
+                            self.admin.username
+                            if i % 2
+                            else f"User {i} very long name he is a very good user"
+                        ),
                     },
                 )
                 chats.append(chat)

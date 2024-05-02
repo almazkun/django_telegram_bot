@@ -1,4 +1,5 @@
 """This module defines types for Telegram and Websocket messages"""
+
 from typing import Any, Dict, List, Optional
 
 

@@ -14,6 +14,8 @@ COPY ./manage.py ./manage.py
 
 FROM python:3.12-alpine
 
+LABEL org.opencontainers.image.source=https://github.com/almazkun/django_telegram_bot
+
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
