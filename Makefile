@@ -38,8 +38,8 @@ push:
 
 run:
 	docker run \
-		-it \
 		--rm \
+		-ti \
 		-d \
 		-p 8000:8000 \
 		--name $(CONTAINER_NAME) \

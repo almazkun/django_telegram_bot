@@ -8,18 +8,26 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 
 import os
 
+import django
+from django.core.asgi import get_asgi_application
+
+# Order here is very important otherwise the Daphne will fail
+# with improperly configured error
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.settings")
+django.setup()
+
+application = get_asgi_application()
+
+
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
-from django.core.asgi import get_asgi_application
 
 from dtb.routing import websocket_urlpatterns
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.settings")
-application = get_asgi_application()
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": application,
         "websocket": AllowedHostsOriginValidator(
             AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
         ),

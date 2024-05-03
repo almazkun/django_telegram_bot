@@ -22,7 +22,9 @@ ENV PYTHONUNBUFFERED=1
 
 ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY --from=builder /app /app
+COPY --from=builder /app/dtb /app/dtb
+COPY --from=builder /app/settings /app/settings
+COPY --from=builder /app/manage.py /app/manage.py
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin/daphne /usr/local/bin/daphne
 
