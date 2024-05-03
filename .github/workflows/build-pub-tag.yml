@@ -1,7 +1,7 @@
 name: Build and publish on tag
 on:
   push:
-    tags:        
+    tags:
       - '*'
 
 jobs:
@@ -14,10 +14,12 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
-        
+
       - 
         name: Set correct environment
-        run: echo "TAG=$(echo ${{ github.ref }} | sed -n 's/refs\/tags\/v//p')" >> $GITHUB_ENV
+        run: |
+          echo "TAG=$(echo ${{ github.ref }} 
+          sed -n 's/refs\/tags\/v//p')" >> $GITHUB_ENV
 
       -
         name: Login to GitHub Container Registry
@@ -43,6 +45,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           port: ${{ secrets.PORT }}
           script: ${{ secrets.SCRIPT }}
-    
