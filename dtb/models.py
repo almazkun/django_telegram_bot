@@ -1,5 +1,6 @@
 import re
 import uuid
+from dtb.providers.chat_gpt import ChatGPT
 from secrets import token_urlsafe
 
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -60,9 +61,23 @@ class Bot(ModelBase):
         return str(self.name)
 
 
+class BotDriver(ModelBase):
+    driver = ChatGPT()
+    title = models.CharField(max_length=100, default=' ChatGPT Settings')
+
+    api_key = models.CharField(
+        max_length=255, default=driver.api_key, unique=True, help_text="Place here Ghat GPT API key"
+    )
+
+    context = models.JSONField(default=list)
+
+    bot = models.ForeignKey(Bot, on_delete=models.CASCADE, related_name="driver", unique=True)
+
+
 class Chat(ModelBase):
     chat_id = models.CharField(max_length=255)
     chat_info = models.JSONField(default=dict)
+    auto_response = models.BooleanField(default=True)
 
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE, related_name="chats")
 

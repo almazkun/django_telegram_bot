@@ -64,9 +64,13 @@ class TelegramProvider(Provider):
         return res
 
     def _handle_message(self, message: Message) -> str:
-        active_admins = ActiveUserCache(str(self.chat.pk)).get()
-        if not active_admins:
-            return "Sorry, no admins are currently online. You may find help at /start."
+        if not self.chat.auto_response:
+            active_admins = ActiveUserCache(str(self.chat.pk)).get()
+            if not active_admins:
+                return "Sorry, no admins are currently online. You may find help at /start."
+        else:
+            driver = self.bot.driver.first()
+            return driver.send_message(message.text)
 
     def _generate_response(self, message: Message) -> str:
         try:

@@ -9,6 +9,8 @@ daphne = "==4.0.0"
 django = "==5.0.1"
 djangorestframework = "==3.14.0"
 django-htmx = "==1.17.2"
+tzdata = "*"
+openai = "==1.25.1"
 
 [dev-packages]
 ruff = "*"

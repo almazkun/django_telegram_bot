@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
-from dtb.models import Bot
+from dtb.models import Bot, BotDriver
 from dtb.usecases.bot_create import BotCreate
 
 logger = logging.getLogger(__name__)
