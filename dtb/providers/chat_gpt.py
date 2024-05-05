@@ -1,58 +1,28 @@
-import openai
-
+from openai import OpenAI
+import os
 
 class ChatGPT:
     api_key = 'sk-proj-DBbxPAiAIbSZGW0f0swzT3BlbkFJB9xpoRfIP29l6ASXnb30'
-    openai.api_key = api_key
 
     def __init__(self):
-        self.conversation_history = []
-        self.max_tokens = 150
+        self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", ChatGPT.api_key))
+        self.messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+        ]
 
-    def add_to_context(self, isUser, message):
-        self.conversation_history.append("User: " if isUser else "AI: " + message)
+    def add_to_context(self, containt):
+        self.messages.append({"role": "system", "content": containt})
 
-    def generateMessage(self):
-        # Build prompt with conversation history
-        prompt = "\n".join(self.conversation_history)
-
-        # Parameters for the completion
-        parameters = {
-            "engine": "text-davinci-003",  # Specify the engine, e.g., text-davinci-003
-            "max_tokens": self.max_tokens  # Maximum number of tokens to generate
-        }
+    def generateMessage(self, user_message):
+        self.messages.append({"role": "user", "content": user_message})
 
         # Call the completion endpoint
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=150,
-            n=1,
-            stop=None,
-            temperature=None,
-            top_p=None,
-            frequency_penalty=None,
-            presence_penalty=None,
-            logprobs=None,
-            logit_bias=None,
-            echo=False,
-            stream=False,
-            **parameters
+        response = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=self.messages,
+            temperature=0,
+            max_tokens=1000
         )
 
         # Get the generated text from the response
-        return response.choices[0].text.strip()
-
-    def send_message(self, message):
-        # Add user message to conversation history
-        self.add_to_context(True, message)
-
-        # chat gpt answer
-        generated_text =  self.generateMessage()
-
-        # Add AI response to conversation history
-        self.add_to_context(False, generated_text)
-
-        # Print AI response
-        print("AI: " + generated_text)
-        return generated_text
+        return response.choices[0].message.content

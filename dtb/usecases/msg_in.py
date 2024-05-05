@@ -70,7 +70,7 @@ class TelegramProvider(Provider):
                 return "Sorry, no admins are currently online. You may find help at /start."
         else:
             driver = self.bot.driver.first()
-            return driver.send_message(message.text)
+            return driver.generateMessage(message.text)
 
     def _generate_response(self, message: Message) -> str:
         try:
