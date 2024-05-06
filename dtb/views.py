@@ -16,7 +16,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from dtb.authentication import BotAuthentication, LoginReqMix
-from dtb.forms import BotCreateForm, LoginForm, SignUpForm
+from dtb.forms import (
+    BotCreateForm,
+    LoginForm,
+    PredictorCreateForm,
+    PredictorUpdateForm,
+    SignUpForm,
+)
 from dtb.models import Bot, BotCommand, Chat
 from dtb.usecases.bot_out import BotOut
 from dtb.usecases.msg_in import MsgIn
@@ -58,7 +64,6 @@ class MyLogoutView(LoginReqMix, LogoutView):
 
 class BotListCreateView(LoginReqMix, ListView, FormView):
     model = Bot
-    template_name = "dtb/bot_list.html"
     context_object_name = "bot_list"
     form_class = BotCreateForm
     success_url = reverse_lazy("bot_list")
@@ -79,21 +84,49 @@ class BotListCreateView(LoginReqMix, ListView, FormView):
     def get_template_names(self) -> list[str]:
         if self.request.htmx:
             return ["dtb/includes/bot_list.html"]
-        return super().get_template_names()
+        return ["dtb/bot_list.html"]
 
 
 class BotDetailView(LoginReqMix, DetailView):
     model = Bot
-    template_name = "dtb/bot_detail.html"
     context_object_name = "bot"
 
     def get_queryset(self) -> QuerySet[Any]:
         return self.request.user.bots.all().prefetch_related("commands")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["command_list"] = self.object.commands.all()
-        return context
+    def patch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.auto_response = not self.object.auto_response
+        self.object.save(update_fields=["auto_response"])
+        request.htmx = True
+        return super().get(request, *args, **kwargs)
+
+    def get_template_names(self) -> list[str]:
+        if self.request.htmx:
+            return ["dtb/includes/bot_detail.html"]
+        return ["dtb/bot_detail.html"]
+
+    def _get_predictor_form(self):
+        self.object = self.get_object()
+        if getattr(self.object, "predictor", None):
+            form = PredictorUpdateForm(instance=self.object.predictor)
+        else:
+            form = PredictorCreateForm(bot=self.object)
+        return form
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        return super().get_context_data(**kwargs) | {
+            "predictor_form": self._get_predictor_form()
+        }
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if getattr(self.object, "predictor", None):
+            form = PredictorUpdateForm(request.POST, instance=self.object.predictor)
+        else:
+            form = PredictorCreateForm(request.POST, bot=self.object)
+        if form.is_valid():
+            form.save()
 
 
 class BotDeleteView(LoginReqMix, DeleteView):

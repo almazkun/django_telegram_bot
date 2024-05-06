@@ -1,6 +1,5 @@
 import re
 import uuid
-from dtb.providers.chat_gpt import ChatGPT
 from secrets import token_urlsafe
 
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -41,6 +40,7 @@ class Bot(ModelBase):
         max_length=32,
         help_text="Human-readable name for thr reference",
     )
+    auto_response = models.BooleanField(default=False)
     # BOT_TOKEN=1234567890:aaaaaaaaaa_bbbbbbbbbbbbb-cccccccccc
     auth_token = models.CharField(
         max_length=255, unique=True, help_text="You can get it from BotFather"
@@ -59,19 +59,6 @@ class Bot(ModelBase):
 
     def __str__(self):
         return str(self.name)
-
-
-class BotDriver(ModelBase):
-    driver = ChatGPT()
-    title = models.CharField(max_length=100, default=' ChatGPT Settings')
-
-    api_key = models.CharField(
-        max_length=255, default=driver.api_key, unique=True, help_text="Place here Ghat GPT API key"
-    )
-
-    context = models.JSONField(default=list)
-
-    bot = models.ForeignKey(Bot, on_delete=models.CASCADE, related_name="driver", unique=True)
 
 
 class Chat(ModelBase):
@@ -137,3 +124,9 @@ class BotCommand(ModelBase):
 
     class Meta:
         unique_together = ("bot", "command")
+
+
+class Predictor(ModelBase):
+    api_key = models.CharField("OpenAI API Key", max_length=100)
+    context = models.TextField("System Prompt")
+    bot = models.OneToOneField(Bot, on_delete=models.CASCADE, related_name="predictor")

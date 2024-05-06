@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from dtb.providers.chat_gpt import ChatGPT
 
 
@@ -7,14 +8,16 @@ class ChatGptTestCase(TestCase):
         self.chat_gpt = ChatGPT()
 
     def test_simple_context(self):
-        answer = self.chat_gpt.generateMessage("Translate to French a word Victory. Show me only the translated word")
+        answer = self.chat_gpt.generateMessage(
+            "Translate to French a word Victory. Show me only the translated word"
+        )
         self.assertEqual(answer, "Victoire")
 
     def test_realistic_context(self):
         chat_gpt = ChatGPT()
         context = """
-        Context: Large sports store. There are three main branches: football, boxing, swimming. 
-        Each of the departments has areas for men and women, who in turn are divided by age: adult children. 
+        Context: Large sports store. There are three main branches: football, boxing, swimming.
+        Each of the departments has areas for men and women, who in turn are divided by age: adult children.
 
         Telephone extensions for all venues:
 
@@ -47,7 +50,9 @@ class ChatGptTestCase(TestCase):
         """
 
         chat_gpt.add_to_context(context)
-        answer = chat_gpt.generateMessage("I want to get advice on fins for a 12 year old girl. "
-                                          "I want to see your answer where will be only phone number without other words!")
+        answer = chat_gpt.generateMessage(
+            "I want to get advice on fins for a 12 year old girl. "
+            "I want to see your answer where will be only phone number without other words!"
+        )
 
         self.assertEqual(answer, "+041122377322")

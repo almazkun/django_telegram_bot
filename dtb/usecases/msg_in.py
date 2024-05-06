@@ -39,18 +39,6 @@ class TelegramProvider(Provider):
             message_info=msg,
         )
 
-    def response_to(self, message: Message):
-        res = self._generate_response(message)
-        if res:
-            return self.chat.messages.create(
-                text=res,
-                from_user={
-                    "id": str(self.bot.pk),
-                    "is_bot": True,
-                    "first_name": self.bot.name,
-                },
-            )
-
     def _is_command(self, text) -> bool:
         return text.startswith("/")
 
@@ -82,6 +70,18 @@ class TelegramProvider(Provider):
         except Exception as e:
             logger.exception(e)
             return "Sorry, something went wrong! Please try again later."
+
+    def response_to(self, message: Message):
+        res = self._generate_response(message)
+        if res:
+            return self.chat.messages.create(
+                text=res,
+                from_user={
+                    "id": str(self.bot.pk),
+                    "is_bot": True,
+                    "first_name": self.bot.name,
+                },
+            )
 
 
 class WebsocketProvider(Provider):

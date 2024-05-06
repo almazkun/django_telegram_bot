@@ -9,7 +9,7 @@
         {% elif chat_selected %}
             <h1 class="display-5 text-truncate">Chat with {{ chat_selected.name }}</h1>
             <p class="lead mb-0">History of your conversation</p>
-            {% url "message_list" chat_selected.pk as prev_page %}
+            {% url "chat_list" chat_selected.bot.pk as prev_page %}
             {% url "bot_detail" chat_selected.bot.pk as settings_page %}
         {% endif %}
         {% include "dtb/includes/sub_nav.html" %}

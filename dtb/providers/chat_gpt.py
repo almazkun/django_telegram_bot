@@ -1,28 +1,60 @@
-from openai import OpenAI
-import os
+from typing import Dict, List
 
-class ChatGPT:
-    api_key = 'sk-proj-DBbxPAiAIbSZGW0f0swzT3BlbkFJB9xpoRfIP29l6ASXnb30'
+from asgiref.sync import async_to_sync
+from openai import AsyncAPIResponse, AsyncOpenAI
 
-    def __init__(self):
-        self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", ChatGPT.api_key))
-        self.messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-        ]
 
-    def add_to_context(self, containt):
-        self.messages.append({"role": "system", "content": containt})
+async def chat_complete(
+    message_list: List[Dict],
+    model: str,
+    api_key: str,
+) -> AsyncAPIResponse:
+    """Get a response from OpenAI.
+    https://platform.openai.com/docs/guides/gpt/chat-completions-api
 
-    def generateMessage(self, user_message):
-        self.messages.append({"role": "user", "content": user_message})
+    Args:
+        messages: A list of messages from the user and the bot.
+        model: The name of the model to use.
+        api_key: The API key to use.
 
-        # Call the completion endpoint
-        response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=self.messages,
-            temperature=0,
-            max_tokens=1000
-        )
+    Returns:
+        ```{
+            "id": "chatcmpl-qwerefsd",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "index": 0,
+                    "logprobs": null,
+                    "message": {
+                        "content": "Great!.",
+                        "role": "assistant",
+                    }
+                }
+            ],
+            "created": 1714547383,
+            "model": "gpt-3.5-turbo-0125",
+            "object": "chat.completion",
+            "system_fingerprint": "fp_3b956da36b",
+            "usage": {
+                "completion_tokens": 93,
+                "prompt_tokens": 234,
+                "total_tokens": 327
+            }
+        }
+        ```
+    """
+    client = AsyncOpenAI(api_key=api_key)
+    return await client.chat.completions.create(model=model, messages=message_list)
 
-        # Get the generated text from the response
-        return response.choices[0].message.content
+
+async def generate_response(
+    message_list: list,
+    model_name: str,
+    api_key: str,
+) -> str:
+    response = async_to_sync(chat_complete)(
+        message_list,
+        model_name,
+        api_key,
+    )
+    return response.choices[0].message.content
