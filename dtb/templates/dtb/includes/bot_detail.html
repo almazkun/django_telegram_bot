@@ -8,7 +8,7 @@
 </nav>
 <div class="mb-4 row">
     <div class="col-md-3 overflow-scroll" style="max-height:65dvh">
-        <div class="card rounded-0  mb-4">
+        <div class="card rounded-0 mb-4">
             <div class="card-body">
                 <h2 class="card-title">Bot Info</h2>
                 <p>
@@ -29,14 +29,14 @@
                 <p>
                     <strong>Auto response is:</strong>
                     {% if bot.auto_response %}
-                        <span class="badge bg-success">Enabled</span>
+                        <span class="badge bg-success rounded-0">Enabled</span>
                     {% else %}
-                        <span class="badge bg-danger">Disabled</span>
+                        <span class="badge bg-danger rounded-0">Disabled</span>
                     {% endif %}
                 </p>
             </div>
         </div>
-        <div class="rounded-0  mb-4">
+        <div class="rounded-0 mb-4">
             <ul class="list-group list-group-flush border rounded-0">
                 <li class="list-group-item list-group-item-action"
                     hx-patch=""
@@ -59,15 +59,13 @@
             <div class="card-body">
                 <h2 class="card-title">Auto Response</h2>
                 {% if bot.predictor %}
-                    <textarea class="form-control" rows="5" readonly>{{ bot.predictor.context }}</textarea>
+                    <div hx-target="this" hx-swap="outerHTML">{% include "dtb/includes/predictor_detail.html" %}</div>
                 {% else %}
                     <p class="text-muted">Chat GPT is not connected to this bot</p>
-                    <form method="post">
-                        {% csrf_token %}
-                        {{ predictor_form.as_p }}
-                        <button class="btn btn-primary">Connect Chat GPT</button>
-                    {% endif %}
-                </div>
+                    {% include "dtb/includes/predictor_create.html" %}
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
+</div>

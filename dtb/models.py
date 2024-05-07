@@ -130,3 +130,9 @@ class Predictor(ModelBase):
     api_key = models.CharField("OpenAI API Key", max_length=100)
     context = models.TextField("System Prompt")
     bot = models.OneToOneField(Bot, on_delete=models.CASCADE, related_name="predictor")
+
+    @property
+    def api_key_display(self):
+        if not self.api_key:
+            return "No API Key"
+        return self.api_key[:10] + ("." * 38)

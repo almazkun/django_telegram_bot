@@ -15,6 +15,7 @@ from dtb.views import (
     MessageListView,
     MyLoginView,
     MyLogoutView,
+    PredictorUpdateView,
     SignUpView,
 )
 
@@ -35,6 +36,11 @@ urlpatterns += [
     path("bots/<str:pk>/cmds/", BotCmdListView.as_view(), name="bot_cmd_list"),
     path("bots/<str:pk>/chats/", ChatListView.as_view(), name="chat_list"),
     path("bots/<str:pk>/delete/", BotDeleteView.as_view(), name="bot_delete"),
+    path(
+        "bots/<str:pk>/predictor/update/",
+        PredictorUpdateView.as_view(),
+        name="predictor_update",
+    ),
     path("bots/<str:pk>/", BotDetailView.as_view(), name="bot_detail"),
     path("", BotListCreateView.as_view(), name="bot_list"),
 ]

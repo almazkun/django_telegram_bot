@@ -106,12 +106,12 @@ class BotDetailView(LoginReqMix, DetailView):
             return ["dtb/includes/bot_detail.html"]
         return ["dtb/bot_detail.html"]
 
-    def _get_predictor_form(self):
+    def _get_predictor_form(self, data=None):
         self.object = self.get_object()
         if getattr(self.object, "predictor", None):
-            form = PredictorUpdateForm(instance=self.object.predictor)
+            form = PredictorUpdateForm(data, instance=self.object.predictor)
         else:
-            form = PredictorCreateForm(bot=self.object)
+            form = PredictorCreateForm(data, bot=self.object)
         return form
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -119,14 +119,38 @@ class BotDetailView(LoginReqMix, DetailView):
             "predictor_form": self._get_predictor_form()
         }
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.predictor.delete()
+        self.object.auto_response = False
+        self.object.save(update_fields=["auto_response"])
+        request.htmx = True
+        return super().get(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if getattr(self.object, "predictor", None):
-            form = PredictorUpdateForm(request.POST, instance=self.object.predictor)
-        else:
-            form = PredictorCreateForm(request.POST, bot=self.object)
-        if form.is_valid():
-            form.save()
+        data = request.POST.copy()
+        predictor_form = self._get_predictor_form(data)
+
+        if predictor_form.is_valid():
+            predictor_form.save()
+
+        request.htmx = True
+        return self.get(request, *args, **kwargs)
+
+
+class PredictorUpdateView(LoginReqMix, DetailView):
+    model = Bot
+    context_object_name = "bot"
+    template_name = "dtb/includes/predictor_update.html"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.request.user.bots.all()
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        return super().get_context_data(**kwargs) | {
+            "form": PredictorUpdateForm(instance=self.object.predictor)
+        }
 
 
 class BotDeleteView(LoginReqMix, DeleteView):
