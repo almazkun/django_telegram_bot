@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from django.core.exceptions import ObjectDoesNotExist
 
 from dtb.cacher import ActiveUserCache
-from dtb.models import Bot, Chat, CustomUser, Message
+from dtb.models import Bot, Chat, CustomUser, Message, RoleChoices
+from dtb.providers.chat_gpt import generate_response
 from dtb.types import TelegramMessage
 from dtb.usecases.msg_out import MsgOut
 
@@ -22,6 +23,42 @@ class Provider(ABC):
 
 
 class TelegramProvider(Provider):
+    def _is_command(self, text) -> bool:
+        return text.startswith("/")
+
+    def _handle_command(self, message: Message) -> str:
+        command = message.text.split()[0].lower()
+        res = self.bot.commands.get(command=command).response
+        if "{text}" in res:
+            return res.format(text=message.text)
+        elif "{name}" in res:
+            return res.format(name=message.sender)
+        return res
+
+    def _handle_message(self, message: Message) -> str:
+        if not self.chat.auto_response:
+            active_admins = ActiveUserCache(str(self.chat.pk)).get()
+            if not active_admins:
+                return "Sorry, no admins are currently online. You may find help at /start."
+        else:
+            message_list = self.chat.message_list(context=self.bot.predictor.context)
+            return generate_response(
+                message_list=message_list,
+                model_name=self.chat.bot.predictor.model_name,
+                api_key=self.chat.bot.predictor.api_key,
+            )
+
+    def _generate_response(self, message: Message) -> str:
+        try:
+            if self._is_command(message.text):
+                return self._handle_command(message)
+            return self._handle_message(message)
+        except ObjectDoesNotExist:
+            return "Sorry, I don't understand."
+        except Exception as e:
+            logger.exception(e)
+            return "Sorry, something went wrong! Please try again later."
+
     def save(self, incoming_message: dict):
         self.bot = incoming_message["bot"]
         msg = incoming_message["msg"].copy()
@@ -44,6 +81,7 @@ class TelegramProvider(Provider):
         if res:
             return self.chat.messages.create(
                 text=res,
+                role=RoleChoices.SYSTEM,
                 from_user={
                     "id": str(self.bot.pk),
                     "is_bot": True,
@@ -51,40 +89,13 @@ class TelegramProvider(Provider):
                 },
             )
 
-    def _is_command(self, text) -> bool:
-        return text.startswith("/")
-
-    def _handle_command(self, message: Message) -> str:
-        command = message.text.split()[0].lower()
-        res = self.bot.commands.get(command=command).response
-        if "{text}" in res:
-            return res.format(text=message.text)
-        elif "{name}" in res:
-            return res.format(name=message.sender)
-        return res
-
-    def _handle_message(self, message: Message) -> str:
-        active_admins = ActiveUserCache(str(self.chat.pk)).get()
-        if not active_admins:
-            return "Sorry, no admins are currently online. You may find help at /start."
-
-    def _generate_response(self, message: Message) -> str:
-        try:
-            if self._is_command(message.text):
-                return self._handle_command(message)
-            return self._handle_message(message)
-        except ObjectDoesNotExist:
-            return "Sorry, I don't understand."
-        except Exception as e:
-            logger.exception(e)
-            return "Sorry, something went wrong! Please try again later."
-
 
 class WebsocketProvider(Provider):
     def save(self, incoming_message: dict):
         return Message.objects.create(
             text=incoming_message["text"],
             chat=incoming_message["chat"],
+            role=RoleChoices.ASSISTANT,
             from_user={
                 "id": str(incoming_message["user"].pk),
                 "is_bot": False,

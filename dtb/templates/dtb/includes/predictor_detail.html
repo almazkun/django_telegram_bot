@@ -1,0 +1,24 @@
+<p>
+    <strong>Open AI API Key:</strong>
+    <br>
+    <code>{{ bot.predictor.api_key_display }}</code>
+</p>
+<p>
+    <strong>System Prompt:</strong>
+    <textarea class="form-control rounded-0" rows="5" readonly>{{ bot.predictor.context }}</textarea>
+    <small class="form-text text-muted">This is the prompt that will used as a context for the GPT model</small>
+</p>
+<p>
+    <strong>Manage Integration:</strong>
+</p>
+<div class="d-flex justify-content-between">
+    <button class="btn btn-outline-danger rounded-0"
+            hx-delete=""
+            hx-swap="innerHTML"
+            hx-target="#bot_detail_replace"
+            hx-confirm="Are you sure you want to delete this GPT integration?"
+            hx-indicator=".progress"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Delete</button>
+    <button class="btn btn-outline-warning rounded-0"
+            hx-get="{% url 'predictor_update' pk=bot.pk %}">Update</button>
+</div>

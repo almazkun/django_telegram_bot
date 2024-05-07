@@ -20,6 +20,12 @@ def validate_command(value):
         )
 
 
+class RoleChoices(models.IntegerChoices):
+    SYSTEM = (0, "system")
+    ASSISTANT = (1, "assistant")
+    USER = (2, "user")
+
+
 class CustomUser(AbstractUser):
     objects = UserManager()
 
@@ -40,6 +46,7 @@ class Bot(ModelBase):
         max_length=32,
         help_text="Human-readable name for thr reference",
     )
+    auto_response = models.BooleanField(default=False)
     # BOT_TOKEN=1234567890:aaaaaaaaaa_bbbbbbbbbbbbb-cccccccccc
     auth_token = models.CharField(
         max_length=255, unique=True, help_text="You can get it from BotFather"
@@ -63,6 +70,7 @@ class Bot(ModelBase):
 class Chat(ModelBase):
     chat_id = models.CharField(max_length=255)
     chat_info = models.JSONField(default=dict)
+    auto_response = models.BooleanField(default=True)
 
     bot = models.ForeignKey(Bot, on_delete=models.CASCADE, related_name="chats")
 
@@ -82,11 +90,29 @@ class Chat(ModelBase):
     class Meta:
         ordering = ("-updated_at",)
 
+    def message_list(self, context: str, limit: int = 5):
+        l = [
+            {
+                "text": m.text,
+                "role": m.role,
+            }
+            for m in self.messages.last(limit)
+        ]
+        if not any([m.role == RoleChoices.SYSTEM for m in l]):
+            l = [
+                {
+                    "text": context,
+                    "role": RoleChoices.SYSTEM,
+                }
+            ] + l
+        return l[::-1]
+
 
 class Message(ModelBase):
     text = models.TextField()
     from_user = models.JSONField(default=dict)
     message_info = models.JSONField(default=dict)
+    role = models.IntegerField(choices=RoleChoices.choices, default=RoleChoices.USER)
 
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="messages")
 
@@ -122,3 +148,15 @@ class BotCommand(ModelBase):
 
     class Meta:
         unique_together = ("bot", "command")
+
+
+class Predictor(ModelBase):
+    api_key = models.CharField("OpenAI API Key", max_length=100)
+    context = models.TextField("System Prompt")
+    bot = models.OneToOneField(Bot, on_delete=models.CASCADE, related_name="predictor")
+
+    @property
+    def api_key_display(self):
+        if not self.api_key:
+            return "No API Key"
+        return self.api_key[:10] + ("." * 38)

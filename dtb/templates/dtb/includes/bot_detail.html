@@ -8,9 +8,9 @@
 </nav>
 <div class="mb-4 row">
     <div class="col-md-3 overflow-scroll" style="max-height:65dvh">
-        <div class="card rounded-0  mb-4">
+        <div class="card rounded-0 mb-4">
             <div class="card-body">
-                <h2 class="card-title">Info</h2>
+                <h2 class="card-title">Bot Info</h2>
                 <p>
                     <strong>Name:</strong>
                     <br>
@@ -26,28 +26,46 @@
                     <br>
                     {{ bot.created_at }}
                 </p>
+                <p>
+                    <strong>Auto response is:</strong>
+                    {% if bot.auto_response %}
+                        <span class="badge bg-success rounded-0">Enabled</span>
+                    {% else %}
+                        <span class="badge bg-danger rounded-0">Disabled</span>
+                    {% endif %}
+                </p>
             </div>
         </div>
-        <div class="rounded-0  mb-4">
+        <div class="rounded-0 mb-4">
             <ul class="list-group list-group-flush border rounded-0">
-                <li class="list-group-item list-group-item-action">Add Command</li>
-                <li class="list-group-item list-group-item-action">Check Bot Status</li>
+                <li class="list-group-item list-group-item-action"
+                    hx-patch=""
+                    hx-swap="innerHTML"
+                    hx-target="#bot_detail_replace"
+                    hx-indicator=".progress"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                    {% if bot.auto_response %}
+                        Disable Auto Response
+                    {% else %}
+                        Enable Auto response
+                    {% endif %}
+                </li>
                 <li class="list-group-item list-group-item-action">Delete Bot</li>
             </ul>
         </div>
     </div>
     <div class="col-md-9 overflow-scroll mb-4">
-        <div class="card rounded-0 " style="height:65dvh">
+        <div class="card rounded-0" style="height:65dvh">
             <div class="card-body">
-                <h2 class="card-title">Commands</h2>
-                {% for command in command_list %}
-                    <p>
-                        <code>{{ command.command }}</code>
-                        <br>
-                        {{ command.response }}
-                    </p>
-                {% endfor %}
+                <h2 class="card-title">Auto Response</h2>
+                {% if bot.predictor %}
+                    <div hx-target="this" hx-swap="outerHTML">{% include "dtb/includes/predictor_detail.html" %}</div>
+                {% else %}
+                    <p class="text-muted">Chat GPT is not connected to this bot</p>
+                    {% include "dtb/includes/predictor_create.html" %}
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
 </div>

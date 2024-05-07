@@ -1,0 +1,10 @@
+<form method="post">
+    {% csrf_token %}
+    {{ predictor_form.as_p }}
+    <button class="btn btn-outline-warning rounded-0"
+            hx-post=""
+            hx-swap="innerHTML"
+            hx-target="#bot_detail_replace"
+            hx-indicator=".progress"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Connect Chat GPT</button>
+</form>
