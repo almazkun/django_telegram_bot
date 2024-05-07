@@ -36,12 +36,12 @@ class MsgInTestCase(TestCase):
         }
 
     def test_accept_telegram_message(self):
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(6):
             msg_in = MsgIn()
             msg_in.accept_telegram_message(self.bot, self.telegram_message)
             msg_in.save_message()
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             msg_in = MsgIn()
             msg_in.accept_telegram_message(self.bot, self.telegram_message)
             msg_in.save_message()
@@ -54,7 +54,7 @@ class MsgInTestCase(TestCase):
 
     def test_accept_websocket_message(self):
         chat = Chat.objects.create(chat_id=671559018, bot=self.bot)
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             msg_in = MsgIn()
             msg_in.accept_websocket_message(self.user, chat, self.ws_message["text"])
             msg_in.save_message()

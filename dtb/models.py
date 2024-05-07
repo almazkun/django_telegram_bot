@@ -20,6 +20,12 @@ def validate_command(value):
         )
 
 
+class RoleChoices(models.IntegerChoices):
+    SYSTEM = (0, "system")
+    ASSISTANT = (1, "assistant")
+    USER = (2, "user")
+
+
 class CustomUser(AbstractUser):
     objects = UserManager()
 
@@ -84,11 +90,29 @@ class Chat(ModelBase):
     class Meta:
         ordering = ("-updated_at",)
 
+    def message_list(self, context: str, limit: int = 5):
+        l = [
+            {
+                "text": m.text,
+                "role": m.role,
+            }
+            for m in self.messages.last(limit)
+        ]
+        if not any([m.role == RoleChoices.SYSTEM for m in l]):
+            l = [
+                {
+                    "text": context,
+                    "role": RoleChoices.SYSTEM,
+                }
+            ] + l
+        return l[::-1]
+
 
 class Message(ModelBase):
     text = models.TextField()
     from_user = models.JSONField(default=dict)
     message_info = models.JSONField(default=dict)
+    role = models.IntegerField(choices=RoleChoices.choices, default=RoleChoices.USER)
 
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="messages")
 

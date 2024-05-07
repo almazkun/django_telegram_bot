@@ -47,7 +47,7 @@ async def chat_complete(
     return await client.chat.completions.create(model=model, messages=message_list)
 
 
-async def generate_response(
+def generate_response(
     message_list: list,
     model_name: str,
     api_key: str,
