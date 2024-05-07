@@ -49,8 +49,8 @@ async def chat_complete(
 
 def generate_response(
     message_list: list,
-    model_name: str,
     api_key: str,
+    model_name: str = "gpt-3.5-turbo",
 ) -> str:
     response = async_to_sync(chat_complete)(
         message_list,

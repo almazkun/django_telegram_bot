@@ -44,7 +44,6 @@ class TelegramProvider(Provider):
             message_list = self.chat.message_list(context=self.bot.predictor.context)
             return generate_response(
                 message_list=message_list,
-                model_name=self.chat.bot.predictor.model_name,
                 api_key=self.chat.bot.predictor.api_key,
             )
 
