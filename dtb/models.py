@@ -95,8 +95,8 @@ class Chat(ModelBase):
             {"text": m.text, "role": m.get_role_display()}
             for m in self.messages.all()[:limit]
         ]
-        if not any([m.get("role") == RoleChoices.SYSTEM[1] for m in l]):
-            l = [{"text": context, "role": RoleChoices.SYSTEM[1]}] + l
+        if not any([m.get("role") == RoleChoices.SYSTEM.label for m in l]):
+            l = [{"text": context, "role": RoleChoices.SYSTEM.label}] + l
         return l[::-1]
 
 
