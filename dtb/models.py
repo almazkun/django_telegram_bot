@@ -92,11 +92,11 @@ class Chat(ModelBase):
 
     def message_list(self, context: str, limit: int = 5):
         l = [
-            {"text": m.text, "role": m.get_role_display()}
+            {"content": m.text, "role": m.get_role_display()}
             for m in self.messages.all()[:limit]
         ]
         if not any([m.get("role") == RoleChoices.SYSTEM.label for m in l]):
-            l = [{"text": context, "role": RoleChoices.SYSTEM.label}] + l
+            l = [{"content": context, "role": RoleChoices.SYSTEM.label}] + l
         return l[::-1]
 
 
