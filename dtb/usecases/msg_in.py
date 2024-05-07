@@ -35,7 +35,7 @@ class TelegramProvider(Provider):
             return res.format(name=message.sender)
         return res
 
-    def _handle_message(self, message: Message) -> str:
+    def _handle_message(self) -> str:
         if not self.chat.auto_response:
             active_admins = ActiveUserCache(str(self.chat.pk)).get()
             if not active_admins:
@@ -52,7 +52,7 @@ class TelegramProvider(Provider):
         try:
             if self._is_command(message.text):
                 return self._handle_command(message)
-            return self._handle_message(message)
+            return self._handle_message()
         except ObjectDoesNotExist:
             return "Sorry, I don't understand."
         except Exception as e:
