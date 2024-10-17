@@ -12,6 +12,12 @@ from dtb.usecases.msg_out import MsgOut
 logger = logging.getLogger(__name__)
 
 
+NO_RESPONSE_MESSAGE = "Sorry, I can't answer you."
+NO_COMMAND_MESSAGE = "Sorry, command not found."
+ERROR_MESSAGE = "Sorry, error occurred."
+OFFLINE_MESSAGE = "Sorry, no admins are currently online. You may find help at /start."
+
+
 class Provider(ABC):
     @abstractmethod
     def save(self, incoming_message: dict):
@@ -36,10 +42,10 @@ class TelegramProvider(Provider):
         return res
 
     def _handle_message(self) -> str:
-        if not self.chat.auto_response:
+        if not self.bot.auto_response:
             active_admins = ActiveUserCache(str(self.chat.pk)).get()
             if not active_admins:
-                return "Sorry, no admins are currently online. You may find help at /start."
+                return OFFLINE_MESSAGE
         else:
             message_list = self.chat.message_list(context=self.bot.predictor.context)
             return generate_response(
@@ -53,10 +59,10 @@ class TelegramProvider(Provider):
                 return self._handle_command(message)
             return self._handle_message()
         except ObjectDoesNotExist:
-            return "Sorry, I don't understand."
+            return NO_COMMAND_MESSAGE
         except Exception as e:
             logger.exception(e)
-            return "Sorry, something went wrong! Please try again later."
+            return ERROR_MESSAGE
 
     def save(self, incoming_message: dict):
         self.bot = incoming_message["bot"]

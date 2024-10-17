@@ -143,7 +143,7 @@ class BotCommand(ModelBase):
 
 
 class Predictor(ModelBase):
-    api_key = models.CharField("OpenAI API Key", max_length=100)
+    api_key = models.CharField("OpenAI API Key", max_length=255)
     context = models.TextField("System Prompt")
     bot = models.OneToOneField(Bot, on_delete=models.CASCADE, related_name="predictor")
 

@@ -1,5 +1,5 @@
 REGISTRY=ghcr.io/almazkun
-IMAGE_NAME=django-telegram-bot
+IMAGE_NAME=django_telegram_bot
 CONTAINER_NAME=django-telegram-bot
 VERSION=latest
 k=./

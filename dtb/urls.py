@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.urls import path
 
 from dtb.views import (
@@ -18,13 +19,16 @@ from dtb.views import (
     PredictorUpdateView,
     SignUpView,
 )
-from django.shortcuts import redirect
 
 urlpatterns = [
     path("accounts/login/", MyLoginView.as_view(), name="login"),
     path("accounts/logout/", MyLogoutView.as_view(), name="logout"),
     path("accounts/signup/", SignUpView.as_view(), name="signup"),
-    path("accounts/profile/", lambda request: redirect("bot_list", permanent=True), name="profile"),
+    path(
+        "accounts/profile/",
+        lambda request: redirect("bot_list", permanent=True),
+        name="profile",
+    ),
 ]
 
 urlpatterns += [
