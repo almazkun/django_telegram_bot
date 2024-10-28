@@ -1,6 +1,51 @@
 # django_telegram_bot
 Manage your Telegram Bot with Django
 
+# Functionality
+Serve telegram bot (webhook based) with Django
+- Allows realtime (websocket) 3 ways communication between Telegram User, Bot and admin with web interface
+- Connect ChatGPT to the bot for auto response
+- Simple text auto responses for specific keywords
+- Multiple bots support
+- Admin interface to manage the bot
+
+# Installation
+1. Clone the repository
+```bash
+git clone https://github.com/almazkun/django_telegram_bot
+cd django_telegram_bot
+```
+1. Create a virtual environment and install the dependencies
+```bash
+pipenv install
+pipenv shell
+```
+1. Create a `.env` file in the root directory and add the following
+```bash
+cp .env.example .env
+```
+1. Even for local development, exposed server is required to receive the webhook from Telegram. Use ngrok to expose the server
+```bash
+ngrok http 8000
+```
+1. Update the `.env` file with the ngrok url
+```bash
+DEMO_DOMAIN=https://xxxxxx.ngrok.io
+```
+1. Run the migrations
+```bash
+python manage.py migrate
+```
+1. Create a superuser
+```bash
+python manage.py createsuperuser
+```
+1. Run the server
+```bash
+python manage.py runserver
+```
+
+
 # Deploy
 1. Create git tag and push it to the remote repository
 Github Actions will build and deploy to the server
