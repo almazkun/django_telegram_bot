@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-channels = "==4.1.0"
-daphne = "==4.1.2"
-django = "==5.0.4"
-djangorestframework = "==3.15.1"
-django-htmx = "==1.17.3"
-tzdata = "2024.1"
-openai = "==1.25.2"
+channels = "==4.3.1"
+daphne = "==4.2.1"
+django = "==5.2.5"
+djangorestframework = "==3.16.1"
+django-htmx = "==1.23.2"
+tzdata = "2025.2"
+openai = "==1.101.0"
 
 [dev-packages]
 ruff = "*"

@@ -1,8 +1,8 @@
-FROM python:3.12-alpine AS builder
+FROM python:3.13-alpine AS builder
 
 WORKDIR /app
 
-RUN pip install pipenv
+RUN pip install pipenv==2025.0.4
 
 COPY Pipfile Pipfile.lock ./
 
@@ -12,7 +12,7 @@ COPY ./dtb ./dtb
 COPY ./settings ./settings
 COPY ./manage.py ./manage.py
 
-FROM python:3.12-alpine
+FROM python:3.13-alpine
 
 LABEL org.opencontainers.image.source=https://github.com/almazkun/django_telegram_bot
 
@@ -25,7 +25,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 COPY --from=builder /app/dtb /app/dtb
 COPY --from=builder /app/settings /app/settings
 COPY --from=builder /app/manage.py /app/manage.py
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin/daphne /usr/local/bin/daphne
 
 ENTRYPOINT ["daphne"]

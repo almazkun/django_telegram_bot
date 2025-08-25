@@ -96,7 +96,7 @@ class PredictorCreateForm(BootstrapFormMixin, forms.ModelForm):
 
 
 class PredictorUpdateForm(BootstrapFormMixin, forms.ModelForm):
-    def __init(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["api_key"] = self.get_api_key_field()
 

@@ -101,9 +101,10 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": Path(tempfile.gettempdir()) / "django_cache",
+        "LOCATION": BASE_DIR / ".django_cache",
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -168,19 +169,20 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "default": {"format": "%(asctime)s %(levelname)s %(name)s.%(message)s"},
+        "verbose": {
+            "format": "[{asctime}] {levelname}: {name}.{message}",
+            "style": "{",
+        },
     },
     "handlers": {
         "console": {
             "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
-            "formatter": "default",
+            "formatter": "verbose",
         },
     },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": LOG_LEVEL,
-        },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
     },
 }

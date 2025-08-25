@@ -1,0 +1,20 @@
+line-length = 196
+lint.select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes (undefined names, unused imports)
+    "I",    # isort (import sorting)
+    "C",    # flake8-comprehensions (simplify comprehensions)
+    "B",    # flake8-bugbear (likely bugs and design issues)
+    "T",    # flake8-type-checking (proper use of type-checking blocks)
+    "UP",   # pyupgrade (use modern Python syntax)
+    "SIM",  # flake8-simplify (redundant patterns)
+    "RUF",  # Ruff-specific rules (misc improvements, fast)
+    "DJ",   # flake8-django (Django best practices)
+    "PERF", # Perflint (performance anti-patterns)
+    "PL",   # pylint (common sense and logic issues)
+]
+lint.ignore = ["C901","RUF012","PLR0915"]
+
+[lint.per-file-ignores]
+"*/migrations/*.py" = ["E501", "F401", "F403", "F405", "DJ01", "PLR0912", "SIM117"]
